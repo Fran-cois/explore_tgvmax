@@ -18,10 +18,11 @@
 <body>
 
 <h2 class="text-center">TGVMAX REQUESTS</h2>
+<p class="text-center">Ce projet utilise les ressources de la sncf (actualis&eacutees toutes les 24h, vers 14h). </p>
 <form  id="form" name="name_form" action=" " class="form-group text-center">
    <input type="origine" name="origine">
    <input type="destination" name="destination">
-   <input type="submit" value="REQUEST!" class="btn btn-primary">
+   <input type="submit" value="TCHOU TCHOU !" class="btn btn-primary">
 </form>
 <p id="realhits" class="text-center"></p>
 <div id="container"  class="container center">
@@ -50,30 +51,38 @@ class trajet
     var date = document.createElement("date");
     var origine = document.createElement("origine");
     var destination = document.createElement("destination");
+    var button = document.createElement("a");
 
     var text_heure_depart = document.createTextNode( this.heure_depart );
     var text_heure_arrivee = document.createTextNode( this.heure_arrivee );
     var text_date = document.createTextNode( this.date );
     var text_origine = document.createTextNode( this.origine );
     var text_destination = document.createTextNode( this.destination );
+    var text_button = document.createTextNode('Reserver');
 
     heure_depart.append(text_heure_depart);
     heure_arrivee.append(text_heure_arrivee);
     date.append(text_date);
     origine.append(text_origine);
     destination.append(text_destination);
+    button.append(text_button);
 
     heure_depart.setAttribute("class","col-sm-2 align-self-center");
     heure_arrivee.setAttribute("class","col-sm-2 align-self-center");
     date.setAttribute("class","col-sm-2 align-self-center");
     origine.setAttribute("class","col-sm-2 align-self-center");
     destination.setAttribute("class","col-sm-2 align-self-center");
+    button.setAttribute("class","col-sm-2 align-self-center btn btn-link");
+    button.setAttribute("type","button");
+    button.setAttribute("href","http://trainline.fr");
+    button.setAttribute("target","_blank");
 
     div.append(heure_depart);
     div.append(heure_arrivee);
     div.append(date);
     div.append(origine);
     div.append(destination);
+    div.append(button);
     div.setAttribute("class","row");
 
     var currentDiv = document.getElementById("container");
@@ -90,8 +99,29 @@ function render_train(origine,destination){
           var myObj = JSON.parse(this.responseText);
           var currentDiv = document.getElementById("container");
           currentDiv.innerHTML = "";
-          for(var i = Math.min(myObj.nhits,rows) - 1 ; i > -1 ; i--){
+          myObj.records.sort(function(a,b){
+            if( new Date(a.fields.date) > new Date(b.fields.date)){
+              return 1;
+            }
+            else if (new Date(a.fields.date) <  new Date(b.fields.date)){
+              return -1;
+            }
+            else{
+              if(  parseInt(a.fields.heure_depart.replace(':','.')) >
+                            parseInt(b.fields.heure_depart.replace(':','.')))
+                            return 1;
+              else if (parseInt( a.fields.heure_depart.replace(':','.') )<
+                          parseInt( b.fields.heure_depart.replace(':','.'))){
+                return -1;
+              }
+              else {
+                return 1;
+              }
 
+            }
+
+          });
+          for(var i = 0; i < Math.min(myObj.nhits,rows) ; i++){
           var trajet1 = new trajet(myObj.records[i].fields.heure_depart,
           myObj.records[i].fields.heure_arrivee,
           myObj.records[i].fields.date,
