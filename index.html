@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>TGVMAX REQUESSSTS</h2>
+<form  id="form" name="name_form" action=" " >
+   <input type="origine" name="origine">
+   <input type="destination" name="destination">
+   <input type="submit" value="Submit">
+</form>
+<p id="realhits"></p>
+<div id="container"> </div>
+<script  type="text/javascript">
+var rows = 400;
+class trajet
+{
+  constructor(heure_depart,heure_arrivee,date,origine,destination){
+    this.heure_depart = " " + heure_depart + " ";
+    this.heure_arrivee = " " + heure_arrivee  + " ";
+    this.date = " " + date + " ";
+    this.origine = " " + origine + " ";
+    this.destination = " " + destination + " ";
+  }
+  render(){
+    var div = document.createElement("div");
+    var heure_depart = document.createElement("heure_depart");
+    var heure_arrivee = document.createElement("heure_arrivee");
+    var date = document.createElement("date");
+    var origine = document.createElement("origine");
+    var destination = document.createElement("destination");
+
+    var text_heure_depart = document.createTextNode( this.heure_depart );
+    var text_heure_arrivee = document.createTextNode( this.heure_arrivee );
+    var text_date = document.createTextNode( this.date );
+    var text_origine = document.createTextNode( this.origine );
+    var text_destination = document.createTextNode( this.destination );
+
+    heure_depart.append(text_heure_depart);
+    heure_arrivee.append(text_heure_arrivee);
+    date.append(text_date);
+    origine.append(text_origine);
+    destination.append(text_destination);
+
+    div.append(heure_depart);
+    div.append(heure_arrivee);
+    div.append(date);
+    div.append(origine);
+    div.append(destination);
+
+    var currentDiv = document.getElementById("container");
+    //document.body.insertBefore(div, currentDiv);
+    currentDiv.append(div);
+  }
+}
+
+
+function render_train(origine,destination){
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          var count_OUI = 0;
+          var myObj = JSON.parse(this.responseText);
+          //document.getElementById("nhits").innerHTML = myObj.nhits;
+          //document.getElementById("results").innerHTML = myObj.nhits;
+          var currentDiv = document.getElementById("container");
+          currentDiv.innerHTML = "";
+          for(var i = Math.min(myObj.nhits,rows) - 1 ; i > -1 ; i--){
+
+          var trajet1 = new trajet(myObj.records[i].fields.heure_depart,
+          myObj.records[i].fields.heure_arrivee,
+          myObj.records[i].fields.date,
+          myObj.records[i].fields.origine,
+          myObj.records[i].fields.destination);
+          if(myObj.records[i].fields.od_happy_card == "OUI"){
+            trajet1.render();
+            count_OUI ++;
+          }
+          document.getElementById("realhits").innerHTML = "Train(s) disponibles: " + count_OUI + "/" +myObj.nhits ;
+
+        }
+      }
+  };  var base_api="https://ressources.data.sncf.com/api/records/1.0/search/?dataset=tgvmax&";
+  var query='q=origine%3A%22'+origine+'%22destination%3A%22'+destination+'%22';
+  var end_query="&rows="+rows+"&sort=date&facet=date&facet=origine&facet=destination";
+  xmlhttp.open("GET", base_api + query + end_query,true);
+  xmlhttp.send();
+}
+//xmlhttp.open("GET", "https://data.sncf.com/api/records/1.0/search/?dataset=tgvmax&q=origine%3APARIS+(intramuros)&lang=fr&rows=1000&sort=date&facet=date&facet=origine&facet=destination", true);
+//xmlhttp.send();
+var destination="MARSEILLE";
+var origine="PARIS";
+render_train(origine,destination);
+function render_train_form(event)
+{
+  event.preventDefault();
+  var origine = document.forms.name_form.origine.value;
+  var destination = document.forms.name_form.destination.value;
+  console.log(origine);
+  console.log(destination);
+  render_train(origine,destination);
+  return true;
+}
+document.getElementById("form").addEventListener("submit",render_train_form);
+
+</script>
+
+
+</body>
+</html>
