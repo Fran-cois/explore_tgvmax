@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html>
+<header>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"> </script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+</header>
+
 <body>
 
-<h2>TGVMAX REQUESSSTS</h2>
-<form  id="form" name="name_form" action=" " >
+<h2 class="text-center">TGVMAX REQUESTS</h2>
+<form  id="form" name="name_form" action=" " class="form-group text-center">
    <input type="origine" name="origine">
    <input type="destination" name="destination">
-   <input type="submit" value="Submit">
+   <input type="submit" value="REQUEST!" class="btn btn-primary">
 </form>
-<p id="realhits"></p>
-<div id="container"> </div>
+<p id="realhits" class="text-center"></p>
+<div id="container"  class="container center">
+  <div id="row" class="row">
+  </div>
+ </div>
+
+
+
+
 <script  type="text/javascript">
 var rows = 400;
 class trajet
@@ -41,14 +63,20 @@ class trajet
     origine.append(text_origine);
     destination.append(text_destination);
 
+    heure_depart.setAttribute("class","col-sm-2 align-self-center");
+    heure_arrivee.setAttribute("class","col-sm-2 align-self-center");
+    date.setAttribute("class","col-sm-2 align-self-center");
+    origine.setAttribute("class","col-sm-2 align-self-center");
+    destination.setAttribute("class","col-sm-2 align-self-center");
+
     div.append(heure_depart);
     div.append(heure_arrivee);
     div.append(date);
     div.append(origine);
     div.append(destination);
+    div.setAttribute("class","row");
 
     var currentDiv = document.getElementById("container");
-    //document.body.insertBefore(div, currentDiv);
     currentDiv.append(div);
   }
 }
@@ -60,8 +88,6 @@ function render_train(origine,destination){
       if (this.readyState == 4 && this.status == 200) {
           var count_OUI = 0;
           var myObj = JSON.parse(this.responseText);
-          //document.getElementById("nhits").innerHTML = myObj.nhits;
-          //document.getElementById("results").innerHTML = myObj.nhits;
           var currentDiv = document.getElementById("container");
           currentDiv.innerHTML = "";
           for(var i = Math.min(myObj.nhits,rows) - 1 ; i > -1 ; i--){
@@ -85,18 +111,18 @@ function render_train(origine,destination){
   xmlhttp.open("GET", base_api + query + end_query,true);
   xmlhttp.send();
 }
-//xmlhttp.open("GET", "https://data.sncf.com/api/records/1.0/search/?dataset=tgvmax&q=origine%3APARIS+(intramuros)&lang=fr&rows=1000&sort=date&facet=date&facet=origine&facet=destination", true);
-//xmlhttp.send();
+
 var destination="MARSEILLE";
 var origine="PARIS";
+document.forms.name_form.origine.setAttribute("value",origine);
+document.forms.name_form.destination.setAttribute("value",destination);
+
 render_train(origine,destination);
 function render_train_form(event)
 {
   event.preventDefault();
   var origine = document.forms.name_form.origine.value;
   var destination = document.forms.name_form.destination.value;
-  console.log(origine);
-  console.log(destination);
   render_train(origine,destination);
   return true;
 }
